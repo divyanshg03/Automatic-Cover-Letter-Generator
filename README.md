@@ -2,6 +2,7 @@
 # Automated Job Application Workflow
 
 An intelligent n8n automation workflow that streamlines the job application process by automatically scraping LinkedIn job postings, extracting job details using AI, and generating personalized cover letters.
+<img width="1824" height="774" alt="image" src="https://github.com/user-attachments/assets/e036e5ad-6d55-4480-8823-d6232d874041" />
 
 ## 🚀 Features
 
