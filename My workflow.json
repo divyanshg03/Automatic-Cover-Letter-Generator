@@ -1,0 +1,696 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            },
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "c617dd5a-d36e-46c5-82af-ed1538840e97",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "maxItems": 200
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        416,
+        144
+      ],
+      "id": "8f392714-5487-40bc-9429-19fd9afa4a7b",
+      "name": "Limit",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "Linkedin Jobs Scraper - PPR (curious_coder/linkedin-jobs-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/:actorid/input"
+        },
+        "customBody": "{\n    \"count\": 100,\n    \"scrapeCompany\": true,\n    \"urls\": [\n        \"https://www.linkedin.com/jobs/search/?currentJobId=4294330394&distance=100&f_WT=1%2C3&geoId=105214831&keywords=intern&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true\"\n    ]\n}",
+        "timeout": 3600
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -192
+      ],
+      "id": "8bad1e76-0470-4ce7-adb9-b0d3609b899b",
+      "name": "Run an Actor and get dataset",
+      "credentials": {
+        "apifyApi": {
+          "id": "ePQ7nIXFnvahVONO",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "you are an intelligent bot capable of pulling out data from a job listing site:",
+              "role": "model"
+            },
+            {
+              "content": "=here's the job site:\n{{ $json.link }}"
+            },
+            {
+              "content": "=please output the data in the JSON format using the following structure:\n{\n  \"company_name\": \"\",\n  \"benefits\": \"\",\n  \"location\": \"\",\n  \"job_description\": \"\"\n}\n ",
+              "role": "model"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        0
+      ],
+      "id": "7e0662fd-060d-414b-a8c5-8bd5eb2eaef1",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Su8PphAylNw7BiTq",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        112
+      ],
+      "id": "a74eeb6b-2bbe-4968-af82-f5d9a04a28d4",
+      "name": "Wait",
+      "webhookId": "28f97673-4178-4859-8e3b-3465a558c979"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "you are an intelligent bot perfect at creating cover letters for a job.\nPlease find the candidates resume to create a customized cover letter for the job.\n\n",
+              "role": "model"
+            },
+            {
+              "content": "=Here's the job listing details:\n{{ $json.content.parts[0].text }}\n\nDivyansh Gupta\n📞 +91-9058261080\n📧 divyanshgupta0804@gmail.com\nhttps://www.linkedin.com/in/divyansh-gupta-77a0a9287/\ngithub- divyanshg03\n\n🎓 Education\n\nBachelor of Technology in Mechanical Engineering (2023 – 2027(Expected))\nIndian Institute Of Technology, Patna – CGPA: 7.13\n\nDoon International School (2020 – 2022)\nClass XII (CBSE) – 92%\n\nSt. George’s College (March 2020)\nClass X (CISCE) – 98%\n\n💻 Projects\n\nStudent Performance Prediction (Source Code\n, Web App\n)\n\nBuilt model using Logistic Regression, Random Forest, and KNN, achieving 88% accuracy.\n\nImplemented EDA and preprocessing pipelines (OneHotEncoder, StandardScaler).\n\nDeployed via Flask REST API + Render.\n\nCredit Card Fraud Detection (Source Code\n)\n\nDesigned fraud detection system with preprocessing, feature engineering, evaluation.\n\nFinal model: Random Forest → 99% accuracy, AUC > 0.9.\n\nDeployed real-time web app with Streamlit.\n\nCustomer Churn Prediction (Source Code\n)\n\nBuilt churn model with 80% test accuracy on Kaggle dataset.\n\nPreprocessed categorical/missing data, visualized feature importance + ROC curves.\n\n⚡ Skills\n\nLanguages: Python, HTML, CSS, JavaScript, C/C++, Java (Basics)\n\nFrameworks/Tools: PyTorch, MySQL, Jupyter, Anaconda, PyCharm, VS Code, Git/GitHub, MS Excel\n\nLibraries: Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn, XGBoost, LightGBM, PyGeometric\n\nKey Courses: C Programming, Data Science, ML & DS, Deep Learning\n\nSoft Skills: Problem Solving, Communication, Team Collaboration, Leadership, Adaptability, Time Management, Analytical Thinking, Attention to Detail, Initiative\n\n🏆 Accomplishments\n\nRanked 3,766 globally in Codeforces Round 1013 (Div. 3).\n\nSecured AIR 11,006 out of 200,000+ students in JEE Advanced 2023.\n\nAchieved 98.6 percentile in JEE Mains 2023.\n\nVolunteered in Sponsorship Committee, Celesta IIT Patna (technical fest).\n\n👥 Leadership & Extracurricular\n\nCore Team Member, Oratory Club HOOT → Organized debates, represented IIT Patna, grew debating culture.\n\nSub-Coordinator, Sponsorship & Marketing, CELESTA → Persuaded organizations to invest in IIT Patna’s techno-management fest. "
+            },
+            {
+              "content": "Please return the JSON data structured in the following way:\n{\n\"cover_letter\": \"\"\n}",
+              "role": "model"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        0
+      ],
+      "id": "75364466-2a98-4847-87e7-3c7d17fae9e2",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vwB9SSE3UhIIU6Ug",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/hKByXkMQaC5Qt9UMN/run-sync-get-dataset-items",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer apify_api_cBJPVk9x0et80DBBDjEyaZi4aJ8UZE2AKoBj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"count\": 200,\n    \"scrapeCompany\": true,\n    \"urls\": [\n        \"https://www.linkedin.com/jobs/search/?currentJobId=4294330394&distance=100&f_WT=1%2C3&geoId=105214831&keywords=intern&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true\"\n    ]\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        -240
+      ],
+      "id": "05f21865-eb3a-4742-95ee-d05dd200cd7d",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        -224
+      ],
+      "id": "dfb2061b-5f6b-4cbd-a57f-a7ef6fadeca0",
+      "name": "Wait1",
+      "webhookId": "a4811825-8fd1-468d-9392-1bd18a201c49"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1auWGYZ5X1k-a1dmyo6XDP3drftTSgdjj4g5lqYteWAQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1auWGYZ5X1k-a1dmyo6XDP3drftTSgdjj4g5lqYteWAQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Loop Over Items').item.json.id }}",
+            "Cover Letter": "={{ $json.candidates[0].content.parts[0].text }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyName",
+              "displayName": "companyName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyLinkedinUrl",
+              "displayName": "companyLinkedinUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyLogo",
+              "displayName": "companyLogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "postedAt",
+              "displayName": "postedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "benefits",
+              "displayName": "benefits",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descriptionHtml",
+              "displayName": "descriptionHtml",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "applicantsCount",
+              "displayName": "applicantsCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "applyUrl",
+              "displayName": "applyUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "salary",
+              "displayName": "salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descriptionText",
+              "displayName": "descriptionText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "seniorityLevel",
+              "displayName": "seniorityLevel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "employmentType",
+              "displayName": "employmentType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "jobFunction",
+              "displayName": "jobFunction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "industries",
+              "displayName": "industries",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyAddress",
+              "displayName": "companyAddress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyWebsite",
+              "displayName": "companyWebsite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companySlogan",
+              "displayName": "companySlogan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyDescription",
+              "displayName": "companyDescription",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "companyEmployeesCount",
+              "displayName": "companyEmployeesCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Cover Letter",
+              "displayName": "Cover Letter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "candidates",
+              "displayName": "candidates",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "usageMetadata",
+              "displayName": "usageMetadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "modelVersion",
+              "displayName": "modelVersion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "responseId",
+              "displayName": "responseId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2112,
+        -16
+      ],
+      "id": "1922a4ea-a7ae-4f90-a80c-8ffaeec10729",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0qRixkLTyEXkqgQx",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        656,
+        -224
+      ],
+      "id": "c8ce6bcb-b922-49de-a50d-6e824a6eecdb",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        864,
+        64
+      ],
+      "id": "e02f20dd-e6cf-43fd-a367-fa242f22e87d"
+    }
+  ],
+  "pinData": {
+    "Append or update row in sheet": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor and get dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        []
+      ]
+    },
+    "Run an Actor and get dataset": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d619eca1-c8e2-4a35-9864-d5a6c9f7b19b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "80894546cc0833e4edf467a151fe6c16eeebf69ab459bd272d27f59179873129"
+  },
+  "id": "66bafuI4gOG136Q7",
+  "tags": []
+}
